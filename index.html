@@ -20,13 +20,13 @@
             justify-content: center; align-items: center; text-align: center;
         }
 
-        /* Contenedor del Universo: Todo está aquí dentro para que se mueva junto */
         #universe {
             position: absolute; 
             width: 7000px; 
             height: 7000px;
             background: radial-gradient(circle at center, #05051a 0%, #02020a 100%);
             z-index: 0;
+            transition: transform 0.1s ease-out;
         }
 
         #lyrics-container {
@@ -39,23 +39,22 @@
         #lyric-es { font-size: 2.2em; font-weight: bold; margin-bottom: 10px; }
         #lyric-en { font-size: 1.2em; font-style: italic; color: rgba(255,255,255,0.6); }
 
-        /* Estrellas */
         .star { position: absolute; background-color: white; border-radius: 50%; animation: blink 3s infinite; }
         
         .clickable-star { cursor: pointer; z-index: 10; }
         .clickable-star::after {
             content: ''; position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: transparent;
+            width: 65px; height: 65px; background: transparent;
         }
 
         .special-star { 
-            width: 8px !important; height: 8px !important;
+            width: 9px !important; height: 9px !important;
             box-shadow: 0 0 15px 5px #ffd700, 0 0 30px 10px rgba(255, 215, 0, 0.6); 
         }
         
         .gift-star { 
-            width: 8px !important; height: 8px !important;
+            width: 9px !important; height: 9px !important;
             box-shadow: 0 0 18px 6px #ff69b4, 0 0 35px 12px rgba(255, 105, 180, 0.7); 
         }
 
@@ -84,7 +83,7 @@
     </div>
 
     <div class="ui-overlay">
-        <h2 style="margin:0; color:#ffd700;">Felices 7 meses✨</h2>
+        <h2 style="margin:0; color:#ffd700;">7 meses juntos✨</h2>
         <small>⚪ Doradas: Mensajes | 🌸 Rosas: Regalos</small>
     </div>
 
@@ -111,32 +110,38 @@
         const specialMessage = document.getElementById('special-message');
 
         const universeSize = 7000;
-        // Centrado inicial para que no aparezca en una esquina negra
         let curX = -(universeSize / 2) + (window.innerWidth / 2);
         let curY = -(universeSize / 2) + (window.innerHeight / 2);
         universe.style.left = curX + 'px';
         universe.style.top = curY + 'px';
 
         const letras = [
-            { time: 13.5, es: "Solo necesitas saber...", en: "All you need to know..." },
-            { time: 17.5, es: "Que estaré ahí cuando nadie más esté", en: "Is that I'll be there when no one else is around" },
-            { time: 22.0, es: "Solo necesitas saber...", en: "All you need to know..." },
-            { time: 26.5, es: "Que estaré ahí para levantarte del suelo", en: "Is that I'll be there to pick you up off the ground" },
-            { time: 31.0, es: "Estaré ahí para ti", en: "I'll be there for you" },
-            { time: 40.0, es: "Sé que has estado perdida...", en: "I know you've been lost..." },
-            { time: 44.5, es: "Tratando de encontrar tu camino de regreso", en: "Trying to find your way back home" },
-            { time: 49.0, es: "Has estado cargando el peso...", en: "You've been carrying the weight..." },
-            { time: 53.5, es: "De un mundo que no conoces", en: "Of a world you don't know" },
-            { time: 58.0, es: "Pero no estás sola", en: "But you're not alone" },
-            { time: 75.0, es: "Solo necesitas saber...", en: "All you need to know..." },
-            { time: 79.5, es: "Que estaré ahí cuando nadie más esté", en: "Is that I'll be there when no one else is around" },
-            { time: 93.0, es: "Estaré ahí para ti", en: "I'll be there for you" },
-            { time: 115.0, es: "Cuando el cielo se caiga...", en: "When the sky is falling down..." },
-            { time: 120.0, es: "Y sientas que no puedes respirar", en: "And you feel like you can't breathe" },
-            { time: 133.5, es: "Porque no estás sola", en: "Because you're not alone" },
-            { time: 151.0, es: "Solo necesitas saber...", en: "All you need to know..." },
-            { time: 155.5, es: "Que estaré ahí cuando nadie más esté", en: "Is that I'll be there when no one else is around" },
-            { time: 169.0, es: "Estaré ahí para ti", en: "I'll be there for you" }
+            { time: 5, es: "Tan simple como puede ser", en: "Simple as can be" },
+            { time: 8, es: "Tengo tus manos en las mías", en: "I got your hands in mine" },
+            { time: 11, es: "Y no tienes que escuchar con atención", en: "And you don't have to listen carefully" },
+            { time: 14, es: "Te lo diré mil veces", en: "I'll tell you a thousand times" },
+            { time: 17, es: "Cualquier cosa que sientas, ponla sobre mí", en: "Anything you feel, put it all on me" },
+            { time: 21, es: "Todos tus pensamientos, lo quiero todo", en: "All of your thoughts, I want everything" },
+            { time: 25, es: "Y cuando te pongas triste, como a veces pasa", en: "And when you get sad, like you do sometimes" },
+            { time: 29, es: "Ponlo todo sobre mí", en: "Put it all on me" },
+            { time: 34, es: "Te levantaré cuando te sientas mal", en: "I'll lift you when you're feeling low" },
+            { time: 38, es: "Te abrazaré cuando la noche se enfríe", en: "I'll hold you when the night gets cold" },
+            { time: 42, es: "Nunca tendrás que estar sola", en: "You'll never have to be alone" },
+            { time: 46, es: "Y eso es todo lo que necesitas saber", en: "And that's all you need to know" },
+            { time: 51, es: "Sin amor perdido, nos tenemos tú y yo", en: "No love lost, we've got you and I" },
+            { time: 55, es: "Sin nubes, las sacamos del cielo", en: "No clouds, we shoot 'em out the sky" },
+            { time: 59, es: "Nunca tendrás que estar sola", en: "You'll never have to be alone" },
+            { time: 63, es: "Y eso es todo lo que necesitas saber", en: "And that's all you need to know" },
+            { time: 80, es: "Tan simple como puede ser", en: "Simple as can be" },
+            { time: 84, es: "Estaré cerca", en: "I'm gonna be around" },
+            { time: 88, es: "Y sabes que tenemos todo lo que necesitamos", en: "And you know we got everything we need" },
+            { time: 92, es: "Mira esto que encontramos", en: "Look at this thing we found" },
+            { time: 96, es: "Cualquier cosa que sientas, ponla sobre mí", en: "Anything you feel, put it all on me" },
+            { time: 100, es: "Tus miedos y tus pensamientos, dámelo todo", en: "Your fears and your thoughts, give me all of it" },
+            { time: 104, es: "Y cuando te pongas triste, como a veces pasa", en: "And when you get sad, like you do sometimes" },
+            { time: 112, es: "Te levantaré cuando te sientas mal", en: "I'll lift you when you're feeling low" },
+            { time: 121, es: "Nunca tendrás que estar sola", en: "You'll never have to be alone" },
+            { time: 125, es: "Y eso es todo lo que necesitas saber", en: "And that's all you need to know" }
         ];
 
         const mensajes = [
@@ -188,7 +193,6 @@
         window.addEventListener('mouseup', () => isDragging = false); window.addEventListener('touchend', () => isDragging = false);
 
         function init() {
-            // 2000 estrellas de fondo DENTRO del universo para que se muevan con él
             for (let i = 0; i < 2000; i++) createStar('bg');
             mensajes.forEach(m => createStar('special', m));
             regalos.forEach(r => createStar('gift', r));
@@ -197,14 +201,12 @@
         function createStar(type, content = null) {
             const star = document.createElement('div');
             star.className = 'star';
-            // Esparcimos las estrellas por todo el mapa de 7000px
             star.style.left = Math.random() * (universeSize - 200) + 100 + 'px';
             star.style.top = Math.random() * (universeSize - 200) + 100 + 'px';
 
             if (type === 'bg') {
                 const s = Math.random() * 2 + 1;
                 star.style.width = s + 'px'; star.style.height = s + 'px';
-                star.style.animationDelay = Math.random() * 3 + 's';
             } else {
                 star.classList.add('clickable-star');
                 if (type === 'special') {
