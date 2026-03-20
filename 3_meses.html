@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 Meses Juntos 💚💖</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            /* PALETA VERDE Y ROSA: 
+               #ffdde1 (Rosa suave)
+               #ee9ca7 (Rosa más intenso)
+               #a8e063 (Verde lima suave)
+               #56ab2f (Verde hoja) 
+            */
+            background: linear-gradient(-45deg, #ffdde1, #ee9ca7, #c2e59c, #64b3f4);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #2d4036; /* Texto verde oscuro para contraste */
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            /* Fondo blanco semitransparente (Efecto Vidrio limpio) */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 85%;
+            width: 380px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            /* Degradado en el texto del título (Rosa a Verde) */
+            background: -webkit-linear-gradient(45deg, #d9486c, #1a9f64);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* Cajas del contador */
+        .counter-box {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 22%;
+            background: #fff;
+            padding: 10px 5px;
+            border-radius: 15px;
+            /* Sombra suave rosa */
+            box-shadow: 0 4px 15px rgba(238, 156, 167, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .time-unit:hover {
+            transform: translateY(-5px);
+        }
+
+        .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #d9486c; /* Número en rosa fuerte */
+        }
+
+        .label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: #1a9f64; /* Etiqueta en verde */
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        /* Mensaje */
+        .message {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #444;
+            background: linear-gradient(to right, rgba(255, 221, 225, 0.3), rgba(194, 229, 156, 0.3));
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #d9486c; /* Borde lateral rosa */
+        }
+
+        .heart-container {
+            margin-top: 20px;
+            font-size: 2.5rem;
+            animation: heartbeat 1.5s infinite;
+            display: inline-block;
+            color: #d9486c;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Felices 3 Meses</h1>
+        
+        <div class="counter-box">
+            <div class="time-unit">
+                <span class="number" id="days">0</span>
+                <span class="label">Días</span>
+            </div>
+            <div class="time-unit">
+                <span class="number" id="hours">0</span>
+                <span class="label">Horas</span>
+            </div>
+            <div class="time-unit">
+                <span class="number" id="minutes">0</span>
+                <span class="label">Min</span>
+            </div>
+            <div class="time-unit">
+                <span class="number" id="seconds">0</span>
+                <span class="label">Seg</span>
+            </div>
+        </div>
+
+        <div class="message">
+            Sé que estos 3 meses no han sido perfectos y hemos tenido obstáculos, 
+            pero lo que realmente importa es que seguimos aquí, eligiéndonos.<br><br>
+            Gracias por tu paciencia y por quedarte a mi lado a pesar de los problemas. 
+            Te amo muchísimo mi niña. 💚💖
+        </div>
+
+        <div class="heart-container">💖</div>
+    </div>
+
+    <script>
+        // FECHA: 17 Agosto 2025, 10:54 AM 
+        const startDate = new Date("2025-08-17T10:54:00-05:00").getTime();
+
+        function updateCounter() {
+            const now = new Date().getTime();
+            const difference = now - startDate;
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+            document.getElementById("seconds").innerText = seconds;
+        }
+
+        setInterval(updateCounter, 1000);
+        updateCounter();
+    </script>
+
+</body>
+</html>

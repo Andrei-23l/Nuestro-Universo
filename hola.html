@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Me perdonas?</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #001f3f 0%, #7FDBFF 100%);
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: clamp(24px, 6vw, 28px);
+            color: #001f3f;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: clamp(16px, 4vw, 18px);
+            color: #001f3f;
+            margin-bottom: 30px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            -webkit-user-select: none;
+            -ms-user-select: none; 
+            user-select: none;
+        }
+
+        #yes-btn {
+            background-color: #7FDBFF;
+            color: #001f3f;
+        }
+
+        #yes-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(127, 219, 255, 0.5);
+        }
+
+        #no-btn {
+            background-color: #001f3f;
+        }
+        
+        .final-message h1 {
+            color: #001f3f;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="container">
+        <h1 id="main-text">¿Me perdonas?</h1>
+        <p id="secondary-text">Prometo no hacerlo de nuevo ❤️</p>
+        <div class="buttons">
+            <button id="yes-btn">Sí</button>
+            <button id="no-btn">No</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const yesBtn = document.getElementById('yes-btn');
+            const noBtn = document.getElementById('no-btn');
+            const mainText = document.getElementById('main-text');
+            const secondaryText = document.getElementById('secondary-text');
+            const container = document.getElementById('container');
+
+            let noClickCount = 0;
+            let yesButtonScale = 1;
+
+            const noResponses = [
+                { main: "Piénsalo un poquito más, por favor 🙏", sub: "¿De verdad le dirías que no a tu novio?" },
+                { main: "Por favor, no volverá a pasar", sub: "Di que si, vamos 💔" },
+                { main: "No hay opción, tú me obligaste a hacerlo 🥺", sub: "No vale la pena resistirse..." },
+                { main: "¡Mira! El botón de 'Sí' es más grande ahora", sub: "¿No lo ves? ¡Solo haz clic!" },
+                { main: "Me vas a hacer llorar...", sub: "Esta es tu última oportunidad." }
+            ];
+
+            noBtn.addEventListener('click', () => {
+                noClickCount++;
+                yesButtonScale += 0.5;
+                yesBtn.style.transform = `scale(${yesButtonScale})`;
+                
+                const responseIndex = Math.min(noClickCount - 1, noResponses.length - 1);
+                mainText.innerText = noResponses[responseIndex].main;
+                secondaryText.innerText = noResponses[responseIndex].sub;
+
+                if (noClickCount >= 2) {
+                    noBtn.addEventListener('mouseover', moveButton);
+                }
+            });
+
+            function moveButton() {
+                const containerRect = document.body.getBoundingClientRect();
+                const noBtnRect = noBtn.getBoundingClientRect();
+
+                const newX = Math.random() * (containerRect.width - noBtnRect.width);
+                const newY = Math.random() * (containerRect.height - noBtnRect.height);
+
+                noBtn.style.position = 'absolute';
+                noBtn.style.left = `${newX}px`;
+                noBtn.style.top = `${newY}px`;
+            }
+
+            yesBtn.addEventListener('click', () => {
+                container.innerHTML = `
+                    <div class="final-message">
+                        <h1>¡Sabía que aceptarías! 🎉</h1>
+                        <p>¡Eres la mejor! ❤️</p>
+                    </div>
+                `;
+            });
+        });
+    </script>
+
+</body>
+</html>

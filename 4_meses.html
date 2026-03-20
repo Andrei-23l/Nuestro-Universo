@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Para mi niña hermosa ❤️</title>
+    <style>
+        :root {
+            --rosa-pastel: #fce4ec;
+            --rosa-brillante: #f06292;
+            --centro-margarita: #ffeb3b;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--rosa-pastel);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+        }
+
+        /* --- MARGARITAS --- */
+        .margarita {
+            position: absolute; top: -50px; z-index: 0;
+            pointer-events: none; animation: caer linear infinite;
+        }
+        .flor { position: relative; width: 40px; height: 40px; }
+        .centro {
+            position: absolute; top: 50%; left: 50%;
+            width: 12px; height: 12px; background: var(--centro-margarita);
+            border-radius: 50%; transform: translate(-50%, -50%); z-index: 2;
+        }
+        .petalo {
+            position: absolute; top: 50%; left: 50%;
+            width: 18px; height: 8px; background: white;
+            border-radius: 20px; transform-origin: left center;
+        }
+        @keyframes caer {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- INTERFAZ --- */
+        .pantalla {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            transition: all 0.8s ease-in-out;
+        }
+        .oculto { opacity: 0; transform: scale(0.8); pointer-events: none; position: absolute; }
+        .caja {
+            background: rgba(255, 255, 255, 0.95); padding: 35px;
+            border-radius: 30px; border: 2px solid white;
+            box-shadow: 0 15px 35px rgba(240, 98, 146, 0.2);
+            text-align: center; width: 290px;
+        }
+        input {
+            width: 85%; padding: 12px; border: 2px solid #f8bbd0;
+            border-radius: 15px; font-size: 1.1rem; margin-bottom: 20px;
+            text-align: center; color: #ad1457; outline: none;
+        }
+        button {
+            background: var(--rosa-brillante); color: white;
+            border: none; padding: 12px 30px; border-radius: 50px;
+            font-weight: bold; cursor: pointer;
+        }
+
+        /* --- CARTA FINAL --- */
+        #contenedor-final { display: none; width: 100%; height: 100vh; justify-content: center; align-items: center; }
+        
+        .carta-contenedor {
+            background: white; padding: 25px; border-radius: 25px;
+            width: 85%; max-width: 380px; z-index: 5;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .texto-carta {
+            max-height: 350px; overflow-y: scroll;
+            padding-right: 10px; text-align: left;
+            color: #444; line-height: 1.6; font-size: 0.95rem;
+        }
+
+        .texto-carta::-webkit-scrollbar { width: 6px; }
+        .texto-carta::-webkit-scrollbar-thumb { background: var(--rosa-brillante); border-radius: 10px; }
+
+        .foto {
+            width: 80px; height: 80px; border-radius: 12px;
+            border: 3px solid white; object-fit: cover; margin: 5px;
+        }
+
+        /* VIDEO */
+        .video-container {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* CAPA DE RASCADO */
+        #canvas-rasca { 
+            position: fixed; inset: 0; z-index: 20; 
+            touch-action: none; cursor: crosshair; 
+        }
+        
+        .liberar-scroll { pointer-events: none !important; opacity: 0; transition: opacity 2s; }
+
+        .instrucciones-rascar {
+            position: fixed; top: 20px; width: 100%;
+            text-align: center; z-index: 21; color: white;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.4); pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lluvia-margaritas"></div>
+
+    <div id="p1" class="pantalla">
+        <div class="caja">
+            <h2>Nivel 1 🌼</h2>
+            <p>¿Qué día hablamos por primera vez?</p>
+            <input type="number" id="dia" placeholder="Día">
+            <button onclick="check1()">Siguiente</button>
+        </div>
+    </div>
+
+    <div id="p2" class="pantalla oculto">
+        <div class="caja">
+            <h2>Nivel 2 🌼</h2>
+            <p>¿En qué mes fue?</p>
+            <input type="text" id="mes" placeholder="Mes">
+            <button onclick="check2()">Revelar mi carta</button>
+        </div>
+    </div>
+
+    <div id="contenedor-final">
+        <div id="instrucciones" class="instrucciones-rascar">
+            <h2>¡Lo lograste! ✨ Rasca para leer</h2>
+        </div>
+        
+        <div class="pantalla">
+            <div style="display:flex;">
+                <img src="https://ibb.co/7JFGdrdR" class="foto">
+                <img src="TU_FOTO_2" class="foto">
+            </div>
+
+            <div class="carta-contenedor">
+                <h2 style="text-align:center; color:var(--rosa-brillante); margin-top:0;">Para la niña más hermosa ❤️</h2>
+                <div class="texto-carta">
+                    <p>Toda esta historia comenzó un 10 de agosto con un "no sé qué decir". Ese día cambió mi vida; conocí a una niña increíble y muy hermosa, la más bonita que he visto. No te imaginas lo hermosa que me pareces cada vez que veo una foto tuya o prendes la cámara; eres realmente preciosa.</p>
+                    <p>Ya llevamos más de cuatro meses y ojalá lleguemos a muchos más. Tengo muchísimas ganas de seguir conociéndote, queriéndote y amándote. Espero que pronto podamos vernos; quiero estar siempre a tu lado y hacer todas las locuras que se nos ocurran. Quiero vivir contigo y con todos los animalitos que dijiste; formar una familia e irnos a todos los lugares que queramos juntos. Quiero hacer de todo contigo, porque quiero que seas tú.</p>
+                    <p>Gracias por estos cuatro meses y por todo lo que has hecho por mí. Tus regalitos significaron mucho; todos estuvieron muy bonitos. De verdad, gracias por el esfuerzo, lo aprecio muchísimo. ¿Y sabes por qué te elegí? Porque tuviste un detalle conmigo que estoy seguro de que ninguna otra persona hubiera podido hacer sin que se lo pidiera.</p>
+                    <p>A veces, cuando me mandas fotos o te muestras en cámara y yo no, me pongo a pensar que debería hacerlo y que estoy fallando en eso. No es una excusa, pero sabes que mi cámara está horrible y, a veces, me da algo de pena. No sé si fue una burla cuando mencionaste mis ojos, pero así lo sentí; tal vez estoy equivocado. Con esto no intento echarte la culpa, solo estoy tratando de abrirme más contigo.</p>
+                    <p>Quiero pedirte perdón por todas las veces que te hice sentir mal 😞. Fui alguien muy tonto, lo sé, y espero que puedas perdonarme. Eres muy importante para mí y quiero estar contigo por mucho tiempo más. Te amo mucho.</p>
+                    <p>Espero poder tener pronto en mis manos todos los regalitos que me hiciste. Quiero que esta historia siga por mucho tiempo. Sueño con que algún día, al despertar, lo primero que vea sea tu carita y que te duermas en mis brazos; ojalá pronto se cumpla. Estoy muy agradecido de que llegaras a mi vida y hicieras que mis días sean mejores. Eres la mejor niña que pude conocer.</p>
+                    <p>Para terminar, te quiero dedicar una canción. Tal vez no sea de tu estilo, pero para mí significa mucho; es mi canción favorita y no se la dedicaría a cualquier persona, pero tú te has vuelto alguien muy especial e importante en mi vida.</p>
+                    
+                    <p style="text-align: center; font-size: 1.5rem;">Caminaría un millón de millas solo por verte sonreír. Gracias por ser esa persona que me hace sentir más vivo que nunca.</p>
+
+                    <div class="video-container">
+                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/hYnT2I21lxs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;">
+                <img src="TU_FOTO_3" class="foto">
+                <img src="TU_FOTO_4" class="foto">
+            </div>
+        </div>
+        <canvas id="canvas-rasca"></canvas>
+    </div>
+
+    <script>
+        function crearMargarita() {
+            const lluvia = document.getElementById('lluvia-margaritas');
+            const div = document.createElement('div');
+            div.className = 'margarita';
+            let p = ''; for(let i=0;i<8;i++) p+=`<div class="petalo" style="transform:rotate(${i*45}deg) translateX(6px)"></div>`;
+            div.innerHTML = `<div class="flor"><div class="centro"></div>${p}</div>`;
+            div.style.left = Math.random()*100+'vw'; div.style.animationDuration = (Math.random()*3+4)+'s';
+            div.style.transform = `scale(${Math.random()*0.4+0.6})`;
+            lluvia.appendChild(div); setTimeout(()=>div.remove(),7000);
+        }
+        setInterval(crearMargarita, 400);
+
+        function check1(){ if(document.getElementById('dia').value=="10"){ document.getElementById('p1').classList.add('oculto'); setTimeout(()=>{document.getElementById('p1').style.display='none';document.getElementById('p2').classList.remove('oculto');},800);} }
+        function check2(){ if(document.getElementById('mes').value.toLowerCase().trim()=="agosto"){ document.getElementById('p2').classList.add('oculto'); setTimeout(()=>{document.getElementById('p2').style.display='none';document.getElementById('contenedor-final').style.display='flex';iniciarRascado();},800);} }
+
+        function iniciarRascado() {
+            const cvs = document.getElementById('canvas-rasca');
+            const ctx = cvs.getContext('2d');
+            cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+            ctx.fillStyle = '#f8bbd0'; ctx.fillRect(0,0,cvs.width, cvs.height);
+            ctx.globalCompositeOperation = 'destination-out';
+
+            let clicks = 0;
+            const draw = (e) => {
+                const t = e.touches ? e.touches[0] : e;
+                ctx.beginPath(); ctx.arc(t.clientX, t.clientY, 55, 0, Math.PI*2); ctx.fill();
+                clicks++;
+                if(clicks > 50) { // Al rascar un poco, quitamos el bloqueo para que pueda scrollear
+                    cvs.classList.add('liberar-scroll');
+                    document.getElementById('instrucciones').style.display = 'none';
+                    setTimeout(() => cvs.style.display = 'none', 2000);
+                }
+            };
+            cvs.addEventListener('mousemove', (e) => { if(e.buttons===1) draw(e); });
+            cvs.addEventListener('touchstart', draw);
+            cvs.addEventListener('touchmove', (e) => { draw(e); e.preventDefault(); });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Para mi niña hermosa ❤️</title>
+    <style>
+        :root {
+            --rosa-pastel: #fce4ec;
+            --rosa-brillante: #f06292;
+            --centro-margarita: #ffeb3b;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--rosa-pastel);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+        }
+
+        /* --- MARGARITAS --- */
+        .margarita {
+            position: absolute; top: -50px; z-index: 0;
+            pointer-events: none; animation: caer linear infinite;
+        }
+        .flor { position: relative; width: 40px; height: 40px; }
+        .centro {
+            position: absolute; top: 50%; left: 50%;
+            width: 12px; height: 12px; background: var(--centro-margarita);
+            border-radius: 50%; transform: translate(-50%, -50%); z-index: 2;
+        }
+        .petalo {
+            position: absolute; top: 50%; left: 50%;
+            width: 18px; height: 8px; background: white;
+            border-radius: 20px; transform-origin: left center;
+        }
+        @keyframes caer {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- PANTALLAS --- */
+        .pantalla {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            transition: all 0.6s ease-in-out;
+        }
+        .oculto { opacity: 0; transform: scale(0.8); pointer-events: none; position: absolute; }
+        
+        .caja {
+            background: rgba(255, 255, 255, 0.95); padding: 35px;
+            border-radius: 30px; border: 2px solid white;
+            box-shadow: 0 15px 35px rgba(240, 98, 146, 0.2);
+            text-align: center; width: 290px;
+        }
+
+        #contador { font-size: 2.2rem; font-weight: bold; color: #ad1457; margin-top: 15px; }
+        input { width: 85%; padding: 12px; border: 2px solid #f8bbd0; border-radius: 15px; text-align: center; outline: none; margin-bottom: 20px; }
+        
+        .btn-principal { background: var(--rosa-brillante); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; }
+
+        /* --- CARTAS --- */
+        #contenedor-final { display: none; width: 100%; justify-content: center; }
+        .carta-contenedor {
+            background: white; padding: 25px; border-radius: 25px;
+            width: 85%; max-width: 380px; z-index: 5;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .texto-carta { max-height: 380px; overflow-y: auto; padding-right: 10px; line-height: 1.6; font-size: 0.95rem; color: #444; }
+        .btn-accion { display: block; width: 100%; margin-top: 15px; padding: 12px; background: #ad1457; color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; }
+
+        /* --- JUEGO FINAL (SI/NO) --- */
+        .botones-finales { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 20px; width: 100%; }
+        #btn-si { background: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: all 0.2s; z-index: 100; }
+        #btn-no { background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        #canvas-rasca { position: fixed; inset: 0; z-index: 20; touch-action: none; }
+        .liberar-scroll { pointer-events: none !important; opacity: 0; transition: opacity 1.5s; }
+    </style>
+</head>
+<body>
+
+    <div id="lluvia-margaritas"></div>
+
+    <div id="pantalla-espera" class="pantalla">
+        <div class="caja">
+            <h2 style="color: #ad1457; margin: 0;">Holi</h2>
+            <div id="contador">00:00:00</div>
+            <div style="margin-top:20px; opacity:0.5;">
+                <input type="password" id="passSalto" placeholder="Código" oninput="validarSalto()" style="width:60px; padding:5px;">
+            </div>
+        </div>
+    </div>
+
+    <div id="p1" class="pantalla oculto" style="display: none;">
+        <div class="caja">
+            <h2>Nivel 1 🌼</h2>
+            <p>¿Qué día hablamos por primera vez?</p>
+            <input type="number" id="dia" placeholder="Día">
+            <button class="btn-principal" onclick="check1()">Siguiente</button>
+        </div>
+    </div>
+
+    <div id="p2" class="pantalla oculto">
+        <div class="caja">
+            <h2>Nivel 2 🌼</h2>
+            <p>¿En qué mes fue?</p>
+            <input type="text" id="mes" placeholder="Mes">
+            <button class="btn-principal" onclick="check2()">Revelar mi carta</button>
+        </div>
+    </div>
+
+    <div id="contenedor-final">
+        <div class="pantalla">
+            <div id="carta1" class="carta-contenedor">
+                <h2 style="text-align:center; color:var(--rosa-brillante); margin-top:0;">Para la niña más hermosa ❤️</h2>
+                <div class="texto-carta">
+                    <p>Toda esta historia comenzó un 10 de agosto con un "no sé qué decir, jajaja". Ese día cambió mi vida; conocí a una niña increíble y muy hermosa, la más bonita que he visto. No te imaginas lo hermosa que me pareces cada vez que veo una foto tuya o prendes la cámara; eres realmente preciosa.</p>
+                    <p>Ya llevamos más de cuatro meses y ojalá lleguemos a muchos más. Tengo muchísimas ganas de seguir conociéndote, queriéndote y amándote. Espero que pronto podamos vernos; quiero estar siempre a tu lado y hacer todas las locuras que se nos ocurran. Quiero vivir contigo y con todos los animalitos que dijiste; formar una familia e irnos a todos los lugares que queramos juntos. Quiero hacer de todo contigo, porque quiero que seas tú.</p>
+                    <p>Gracias por estos cuatro meses y por todo lo que has hecho por mí. Tus regalitos significaron mucho; todos estuvieron muy bonitos. De verdad, gracias por el esfuerzo, lo aprecio muchísimo. ¿Y sabes por qué te elegí? Porque tuviste un detalle conmigo que estoy seguro de que ninguna otra persona hubiera podido hacer sin que se lo pidiera.</p>
+                    <p>A veces, cuando me mandas fotos o te muestras en cámara y yo no, me pongo a pensar que debería hacerlo y que estoy fallando en eso. No es una excusa, pero sabes que mi cámara está horrible y, a veces, me da algo de pena. No sé si fue una burla cuando mencionaste mis ojos, pero así lo sentí; tal vez estoy equivocado. Con esto no intento echarte la culpa, solo estoy tratando de abrirme más contigo.</p>
+                    <p>Quiero pedirte perdón por todas las veces que te hice sentir mal 😞. Fui alguien muy tonto, lo sé, y espero que puedas perdonarme. Eres muy importante para mí y quiero estar contigo por mucho tiempo más. Te amo mucho.</p>
+                    <p>Espero poder tener pronto en mis manos todos los regalitos que me hiciste. Quiero que esta historia siga por mucho tiempo. Sueño con que algún día, al despertar, lo primero que vea sea tu carita y que te duermas en mis brazos; ojalá pronto se cumpla. Estoy muy agradecido de que llegaras a mi vida y hicieras que mis días sean mejores. Eres la mejor niña que pude conocer. Por un 2026 mejor y siempre juntos.</p>
+                    <p>Para terminar, te quiero dedicar una canción. Tal vez no sea de tu estilo, pero para mí significa mucho; es mi canción favorita y no se la dedicaría a cualquier persona, pero tú te has vuelto alguien muy especial e importante en mi vida.</p>
+                    <div style="margin: 20px 0;">
+                        <iframe width="100%" height="180" src="https://www.youtube.com/embed/hYnT2I21lxs" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <button class="btn-accion" onclick="mostrarCarta2()">Segunda parte ➔</button>
+                </div>
+            </div>
+
+            <div id="carta2" class="carta-contenedor oculto" style="display:none;">
+                <h2 style="text-align:center; color:var(--rosa-brillante); margin-top:0;">Mi niña hermosa ❤️</h2>
+                <div class="texto-carta">
+                    <p>Sé que escribirte esto no es mucho y que no fui ni soy la mejor pareja que puedas tener, pero el sentimiento que tengo por ti es muy real. Te amo y te quiero de una forma que ni siquiera podría describir. Eres lo mejor que me ha pasado, mi mejor coincidencia.</p>
+                    <p>Me siento muy afortunado de formar parte de tu vida. ¡Feliz 5 meses, mi amor! Estos meses han pasado volando y han sido los mejores de mi vida; gracias por todo, TE AMO DEMASIADO.</p>
+                    <p>Y también... ¡Feliz cumpleaños, mi vida! Espero que la pases muy bien y, ojalá, en tu próximo cumple esté ahí contigo dándote un mejor regalo. Mi niña cumple un año más y quiero estar a tu lado por mucho tiempo, amándote por siempre si me lo permites. Te amo, te adoro, me encantas, me fascinas; eres todo para mí, nunca lo olvides.</p>
+                    <button class="btn-accion" style="background:#ad1457" onclick="mostrarPropuesta()">Y por último... ✨</button>
+                </div>
+            </div>
+
+            <div id="propuesta" class="carta-contenedor oculto" style="display:none;">
+                <h2 style="text-align:center; color:var(--rosa-brillante);">¿Quieres ser mi novia? ❤️</h2>
+                <div class="botones-finales">
+                    <button id="btn-si" onclick="aceptarPropuesta()">SÍ</button>
+                    <button id="btn-no" onclick="rechazarPropuesta()">NO</button>
+                </div>
+            </div>
+        </div>
+        <canvas id="canvas-rasca"></canvas>
+    </div>
+
+    <script>
+        // --- RELOJ ---
+        function actualizarContador() {
+            const ahora = new Date();
+            const utc = ahora.getTime() + (ahora.getTimezoneOffset() * 60000);
+            const gmt5 = new Date(utc + (3600000 * -5));
+            const objetivo = new Date(gmt5); objetivo.setHours(9, 5, 0, 0);
+            const dif = objetivo - gmt5;
+            if (dif <= 0) { liberar(); return; }
+            const h = Math.floor((dif/3600000)%24); const m = Math.floor((dif/60000)%60); const s = Math.floor((dif/1000)%60);
+            document.getElementById('contador').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+        function validarSalto() { if(document.getElementById('passSalto').value == "2306") liberar(); }
+        function liberar() { document.getElementById('pantalla-espera').style.display='none'; document.getElementById('p1').style.display='flex'; setTimeout(()=>document.getElementById('p1').classList.remove('oculto'),50); }
+        setInterval(actualizarContador, 1000); actualizarContador();
+
+        // --- MARGARITAS ---
+        setInterval(() => {
+            const lluvia = document.getElementById('lluvia-margaritas');
+            const div = document.createElement('div'); div.className = 'margarita';
+            let p = ''; for(let i=0;i<8;i++) p+=`<div class="petalo" style="transform:rotate(${i*45}deg) translateX(6px)"></div>`;
+            div.innerHTML = `<div class="flor"><div class="centro"></div>${p}</div>`;
+            div.style.left = Math.random()*100+'vw'; div.style.animationDuration = (Math.random()*3+4)+'s';
+            div.style.transform = `scale(${Math.random()*0.4+0.6})`;
+            lluvia.appendChild(div); setTimeout(()=>div.remove(),7000);
+        }, 400);
+
+        // --- NAVEGACIÓN ---
+        function check1(){ if(document.getElementById('dia').value=="10"){ document.getElementById('p1').classList.add('oculto'); setTimeout(()=>{document.getElementById('p1').style.display='none';document.getElementById('p2').classList.remove('oculto');},800);} }
+        function check2(){ if(document.getElementById('mes').value.toLowerCase().trim()=="agosto"){ document.getElementById('p2').classList.add('oculto'); setTimeout(()=>{document.getElementById('p2').style.display='none';document.getElementById('contenedor-final').style.display='flex';iniciarRascado();},800);} }
+        function mostrarCarta2(){ document.getElementById('carta1').classList.add('oculto'); setTimeout(()=>{document.getElementById('carta1').style.display='none';document.getElementById('carta2').style.display='block';setTimeout(()=>document.getElementById('carta2').classList.remove('oculto'),50);},600); }
+        function mostrarPropuesta(){ document.getElementById('carta2').classList.add('oculto'); setTimeout(()=>{document.getElementById('carta2').style.display='none';document.getElementById('propuesta').style.display='block';setTimeout(()=>document.getElementById('propuesta').classList.remove('oculto'),50);},600); }
+
+        // --- LÓGICA SI/NO ---
+        let escalaSi = 1;
+        function rechazarPropuesta() {
+            escalaSi += 0.5;
+            document.getElementById('btn-si').style.transform = `scale(${escalaSi})`;
+            const btnNo = document.getElementById('btn-no');
+            btnNo.style.transform = `scale(${1/escalaSi})`;
+            btnNo.style.opacity = 1 - (escalaSi/10);
+            if(escalaSi > 8) btnNo.style.display = 'none';
+        }
+        function aceptarPropuesta() {
+            document.getElementById('propuesta').innerHTML = `<h2 style="color:var(--rosa-brillante)">¡Por decir que sí te ganaste tus regalos mi amor! ❤️</h2><p style="font-size:3rem">✨🎁✨</p>`;
+        }
+
+        // --- RASCADO ---
+        function iniciarRascado() {
+            const cvs = document.getElementById('canvas-rasca'); const ctx = cvs.getContext('2d');
+            cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+            ctx.fillStyle = '#f8bbd0'; ctx.fillRect(0,0,cvs.width, cvs.height);
+            ctx.globalCompositeOperation = 'destination-out';
+            const draw = (e) => {
+                const t = e.touches ? e.touches[0] : e;
+                ctx.beginPath(); ctx.arc(t.clientX, t.clientY, 50, 0, Math.PI*2); ctx.fill();
+                if(!cvs.classList.contains('liberar-scroll')) cvs.classList.add('liberar-scroll');
+            };
+            cvs.addEventListener('touchmove', (e) => { draw(e); e.preventDefault(); });
+            cvs.addEventListener('mousemove', (e) => { if(e.buttons===1) draw(e); });
+        }
+    </script>
+</body>
+</html>

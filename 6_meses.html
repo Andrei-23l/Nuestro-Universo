@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para mi niña</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #020205;
+            touch-action: none;
+            font-family: 'Georgia', serif;
+        }
+        canvas { display: block; }
+        
+        #ui {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .floating-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffb3c1;
+            font-size: clamp(22px, 6vw, 35px);
+            font-style: italic;
+            text-shadow: 0 0 15px rgba(255, 179, 193, 0.8);
+            pointer-events: none;
+            animation: fadeInOut 4s forwards;
+            white-space: nowrap;
+            width: 100%;
+            text-align: center;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -20%); }
+            20% { opacity: 1; transform: translate(-50%, -50%); }
+            80% { opacity: 1; transform: translate(-50%, -50%); }
+            100% { opacity: 0; transform: translate(-50%, -80%); }
+        }
+
+        #reset-btn {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 25px;
+            background: rgba(255, 62, 108, 0.6); 
+            color: white;
+            border: 1px solid #ff3e6c;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none; 
+            z-index: 999; 
+            font-size: 12px;
+            letter-spacing: 3px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 15px rgba(255, 62, 108, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui">
+        <div id="counter" style="color: rgba(255,255,255,0.3); letter-spacing: 5px; font-size: 12px;">TOCA PARA FLORECER</div>
+        <div id="msg-container"></div>
+    </div>
+    
+    <button id="reset-btn">REINICIAR</button>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const resetBtn = document.getElementById('reset-btn');
+        const msgContainer = document.getElementById('msg-container');
+        
+        let width, height;
+        let flowers = [];
+        let particles = [];
+        let backgroundStars = [];
+        let touchCount = 0;
+        let secretRevealed = false;
+        
+        const TOTAL_TOUCHES = 60;
+        const INITIALS = "J & A";
+        const MESSAGES = {
+            10: "un mes mas juntos",
+            20: "eres todo lo que necesito",
+            30: "gracias por llegar a mi vida",
+            40: "eres lo mejor que me ha pasado",
+            50: "te amo mucho mi niña"
+        };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initBackgroundStars();
+        }
+        window.addEventListener('resize', resize);
+
+        function initBackgroundStars() {
+            backgroundStars = [];
+            for (let i = 0; i < 120; i++) {
+                backgroundStars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 1.5,
+                    opacity: Math.random(),
+                    speed: 0.01 + Math.random() * 0.02
+                });
+            }
+        }
+
+        class Flower {
+            constructor(x, y) {
+                this.x = x; this.y = y;
+                this.size = 0;
+                this.maxSize = Math.random() * 25 + 20;
+                this.hue = Math.random() * 40 + 330; 
+                this.petals = Math.floor(Math.random() * 3) + 5;
+                this.rotation = Math.random() * Math.PI;
+            }
+            draw() {
+                if (this.size < this.maxSize) this.size += 0.6;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                for(let i = 0; i < this.petals; i++){
+                    ctx.rotate((Math.PI * 2) / this.petals);
+                    let grad = ctx.createRadialGradient(0, this.size, 0, 0, this.size, this.size);
+                    grad.addColorStop(0, `hsla(${this.hue}, 90%, 65%, 0.8)`);
+                    grad.addColorStop(1, `hsla(${this.hue - 20}, 70%, 30%, 0)`);
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.quadraticCurveTo(this.size, this.size, 0, this.size * 2);
+                    ctx.quadraticCurveTo(-this.size, this.size, 0, 0);
+                    ctx.fill();
+                }
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size / 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 230, 150, 0.9)";
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class StarParticle {
+            constructor(targetX, targetY) {
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 15;
+                this.vy = (Math.random() - 0.5) * 15;
+                this.history = []; 
+            }
+            update() {
+                let dx = this.targetX - this.x;
+                let dy = this.targetY - this.y;
+                this.vx += dx * 0.02;
+                this.vy += dy * 0.02;
+                this.vx *= 0.93;
+                this.vy *= 0.93;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.history.push({x: this.x, y: this.y});
+                if(this.history.length > 6) this.history.shift();
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(this.history[0].x, this.history[0].y);
+                for(let i=1; i<this.history.length; i++) ctx.lineTo(this.history[i].x, this.history[i].y);
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = "white";
+                ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function showMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'floating-msg';
+            div.innerText = text;
+            msgContainer.appendChild(div);
+            setTimeout(() => div.remove(), 4000);
+        }
+
+        function createTextParticles() {
+            particles = [];
+            ctx.clearRect(0,0,width,height);
+            ctx.fillStyle = 'white';
+            let fontSize = Math.min(width, height) * 0.25;
+            ctx.font = `bold ${fontSize}px serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(INITIALS, width/2, height/2);
+            const data = ctx.getImageData(0,0,width,height).data;
+            for (let y = 0; y < height; y += 6) {
+                for (let x = 0; x < width; x += 6) {
+                    if (data[(y * width + x) * 4 + 3] > 128) {
+                        particles.push(new StarParticle(x, y));
+                    }
+                }
+            }
+            resetBtn.style.display = 'block';
+        }
+
+        function handleInteraction(e) {
+            if (e.target.id === 'reset-btn') return;
+
+            let x = e.touches ? e.touches[0].clientX : e.clientX;
+            let y = e.touches ? e.touches[0].clientY : e.clientY;
+            flowers.push(new Flower(x, y));
+            
+            if(!secretRevealed) {
+                touchCount++;
+                document.getElementById('counter').style.opacity = 0;
+                if(MESSAGES[touchCount]) showMessage(MESSAGES[touchCount]);
+                if(touchCount >= TOTAL_TOUCHES) {
+                    secretRevealed = true;
+                    createTextParticles();
+                }
+            }
+            if(flowers.length > 70) flowers.shift();
+        }
+
+        resetBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            flowers = [];
+            particles = [];
+            touchCount = 0;
+            secretRevealed = false;
+            resetBtn.style.display = 'none';
+            document.getElementById('counter').style.opacity = 1;
+            ctx.clearRect(0, 0, width, height);
+        });
+
+        window.addEventListener('mousedown', handleInteraction);
+        window.addEventListener('touchstart', (e) => { 
+            if (e.target.id !== 'reset-btn') e.preventDefault(); 
+            handleInteraction(e); 
+        }, {passive: false});
+
+        function animate() {
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.25)';
+            ctx.fillRect(0, 0, width, height);
+            backgroundStars.forEach(s => {
+                s.opacity += s.speed;
+                if (s.opacity > 1 || s.opacity < 0.2) s.speed *= -1;
+                ctx.globalAlpha = Math.abs(s.opacity);
+                ctx.fillStyle = "white";
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+            flowers.forEach(f => f.draw());
+            if(secretRevealed) particles.forEach(p => p.update());
+            requestAnimationFrame(animate);
+        }
+
+        resize();
+        animate();
+    </script>
+</body>
+</html>

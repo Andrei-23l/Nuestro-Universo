@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nuestro Universo - 7 Meses ❤️</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: #02020a;
+            font-family: 'Segoe UI', sans-serif; color: white;
+            cursor: grab;
+        }
+        body:active { cursor: grabbing; }
+
+        #overlay-inicio {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #05051a 0%, #02020a 100%);
+            z-index: 1000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+        }
+
+        /* Contenedor del Universo: Todo está aquí dentro para que se mueva junto */
+        #universe {
+            position: absolute; 
+            width: 7000px; 
+            height: 7000px;
+            background: radial-gradient(circle at center, #05051a 0%, #02020a 100%);
+            z-index: 0;
+        }
+
+        #lyrics-container {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center; pointer-events: none;
+            z-index: 50; width: 90%;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        #lyric-es { font-size: 2.2em; font-weight: bold; margin-bottom: 10px; }
+        #lyric-en { font-size: 1.2em; font-style: italic; color: rgba(255,255,255,0.6); }
+
+        /* Estrellas */
+        .star { position: absolute; background-color: white; border-radius: 50%; animation: blink 3s infinite; }
+        
+        .clickable-star { cursor: pointer; z-index: 10; }
+        .clickable-star::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: transparent;
+        }
+
+        .special-star { 
+            width: 8px !important; height: 8px !important;
+            box-shadow: 0 0 15px 5px #ffd700, 0 0 30px 10px rgba(255, 215, 0, 0.6); 
+        }
+        
+        .gift-star { 
+            width: 8px !important; height: 8px !important;
+            box-shadow: 0 0 18px 6px #ff69b4, 0 0 35px 12px rgba(255, 105, 180, 0.7); 
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+
+        .ui-overlay { position: fixed; top: 20px; left: 20px; z-index: 100; pointer-events: none; }
+
+        #special-message {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 30, 0.95); backdrop-filter: blur(15px);
+            border-radius: 20px; padding: 30px; width: 80%; max-width: 400px;
+            border: 1px solid #ffd700; z-index: 2000; text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+        }
+
+        button { background: #ffd700; border: none; color: black; padding: 12px 24px; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay-inicio">
+        <h1 style="color: #ffd700;">Nuestro Universo</h1>
+        <p>Sube el volumen y busca nuestras estrellas</p>
+        <button onclick="empezarViaje()">INICIAR VIAJE ✨</button>
+    </div>
+
+    <div class="ui-overlay">
+        <h2 style="margin:0; color:#ffd700;">Felices 7 meses✨</h2>
+        <small>⚪ Doradas: Mensajes | 🌸 Rosas: Regalos</small>
+    </div>
+
+    <div id="lyrics-container">
+        <div id="lyric-es"></div>
+        <div id="lyric-en"></div>
+    </div>
+
+    <div id="universe"></div>
+
+    <div id="special-message">
+        <h2 id="msg-title" style="color: #ffd700; margin-top:0;"></h2>
+        <p id="msg-text" style="line-height:1.6;"></p>
+        <button onclick="closeMessage()">Seguir explorando</button>
+    </div>
+
+    <audio id="cancion" src="musica.mp3"></audio>
+
+    <script>
+        const universe = document.getElementById('universe');
+        const audio = document.getElementById('cancion');
+        const lyricEs = document.getElementById('lyric-es');
+        const lyricEn = document.getElementById('lyric-en');
+        const specialMessage = document.getElementById('special-message');
+
+        const universeSize = 7000;
+        // Centrado inicial para que no aparezca en una esquina negra
+        let curX = -(universeSize / 2) + (window.innerWidth / 2);
+        let curY = -(universeSize / 2) + (window.innerHeight / 2);
+        universe.style.left = curX + 'px';
+        universe.style.top = curY + 'px';
+
+        const letras = [
+            { time: 13.5, es: "Solo necesitas saber...", en: "All you need to know..." },
+            { time: 17.5, es: "Que estaré ahí cuando nadie más esté", en: "Is that I'll be there when no one else is around" },
+            { time: 22.0, es: "Solo necesitas saber...", en: "All you need to know..." },
+            { time: 26.5, es: "Que estaré ahí para levantarte del suelo", en: "Is that I'll be there to pick you up off the ground" },
+            { time: 31.0, es: "Estaré ahí para ti", en: "I'll be there for you" },
+            { time: 40.0, es: "Sé que has estado perdida...", en: "I know you've been lost..." },
+            { time: 44.5, es: "Tratando de encontrar tu camino de regreso", en: "Trying to find your way back home" },
+            { time: 49.0, es: "Has estado cargando el peso...", en: "You've been carrying the weight..." },
+            { time: 53.5, es: "De un mundo que no conoces", en: "Of a world you don't know" },
+            { time: 58.0, es: "Pero no estás sola", en: "But you're not alone" },
+            { time: 75.0, es: "Solo necesitas saber...", en: "All you need to know..." },
+            { time: 79.5, es: "Que estaré ahí cuando nadie más esté", en: "Is that I'll be there when no one else is around" },
+            { time: 93.0, es: "Estaré ahí para ti", en: "I'll be there for you" },
+            { time: 115.0, es: "Cuando el cielo se caiga...", en: "When the sky is falling down..." },
+            { time: 120.0, es: "Y sientas que no puedes respirar", en: "And you feel like you can't breathe" },
+            { time: 133.5, es: "Porque no estás sola", en: "Because you're not alone" },
+            { time: 151.0, es: "Solo necesitas saber...", en: "All you need to know..." },
+            { time: 155.5, es: "Que estaré ahí cuando nadie más esté", en: "Is that I'll be there when no one else is around" },
+            { time: 169.0, es: "Estaré ahí para ti", en: "I'll be there for you" }
+        ];
+
+        const mensajes = [
+            { t: "La Primera Conversación", d: "Desde ese día supe que serías alguien especial." },
+            { t: "Nuestras Risas", d: "Amo cómo logramos reírnos de cualquier tontería." },
+            { t: "Tu Apoyo", d: "Gracias por estar ahí cuando el mundo se pone difícil." },
+            { t: "Un Mes Más", d: "Cada segundo a tu lado cuenta y vale oro." },
+            { t: "Tus ojos", d: "Me dan paz que no encuentro en ningún otro lugar." },
+            { t: "Aventuras", d: "Por todos los planes que aún nos faltan por cumplir." },
+            { t: "Pequeños Detalles", d: "Cada que vuelvo a ver los regalos me enamoras mas." },
+            { t: "Cero Distancia", d: "No importa dónde estemos, mi corazón está contigo." },
+            { t: "Eres Única", d: "No cambiaría nada de nuestra historia." },
+            { t: "Te Amo", d: "Eres mi universo entero. Felices 7 meses." }
+        ];
+
+        const regalos = [
+            { t: "Mes 2", link: "2_meses.html" }, { t: "Mes 3", link: "3_meses.html" },
+            { t: "Mes 4", link: "4_meses.html" }, { t: "Mes 5", link: "5_meses.html" },
+            { t: "Mes 6", link: "6_meses.html" }, { t: "Mes 7", link: "7_meses.html" },
+            { t: "Hola", link: "hola.html" }
+        ];
+
+        function empezarViaje() {
+            document.getElementById('overlay-inicio').style.display = 'none';
+            audio.play();
+            audio.addEventListener('timeupdate', () => {
+                const live = letras.find((l, i) => audio.currentTime >= l.time && (!letras[i+1] || audio.currentTime < letras[i+1].time));
+                if(live) { lyricEs.innerText = live.es; lyricEn.innerText = live.en; }
+                else { lyricEs.innerText = ""; lyricEn.innerText = ""; }
+            });
+        }
+
+        let isDragging = false, startX, startY;
+        const moveStart = (e) => { 
+            if (e.target.classList.contains('clickable-star')) return;
+            isDragging = true; 
+            startX = (e.pageX || e.touches[0].pageX) - universe.offsetLeft; 
+            startY = (e.pageY || e.touches[0].pageY) - universe.offsetTop; 
+        };
+        const moveAction = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            universe.style.left = ((e.pageX || e.touches[0].pageX) - startX) + 'px';
+            universe.style.top = ((e.pageY || e.touches[0].pageY) - startY) + 'px';
+        };
+
+        window.addEventListener('mousedown', moveStart); window.addEventListener('touchstart', moveStart);
+        window.addEventListener('mousemove', moveAction); window.addEventListener('touchmove', moveAction);
+        window.addEventListener('mouseup', () => isDragging = false); window.addEventListener('touchend', () => isDragging = false);
+
+        function init() {
+            // 2000 estrellas de fondo DENTRO del universo para que se muevan con él
+            for (let i = 0; i < 2000; i++) createStar('bg');
+            mensajes.forEach(m => createStar('special', m));
+            regalos.forEach(r => createStar('gift', r));
+        }
+
+        function createStar(type, content = null) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            // Esparcimos las estrellas por todo el mapa de 7000px
+            star.style.left = Math.random() * (universeSize - 200) + 100 + 'px';
+            star.style.top = Math.random() * (universeSize - 200) + 100 + 'px';
+
+            if (type === 'bg') {
+                const s = Math.random() * 2 + 1;
+                star.style.width = s + 'px'; star.style.height = s + 'px';
+                star.style.animationDelay = Math.random() * 3 + 's';
+            } else {
+                star.classList.add('clickable-star');
+                if (type === 'special') {
+                    star.classList.add('special-star');
+                    star.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        document.getElementById('msg-title').innerText = content.t;
+                        document.getElementById('msg-text').innerText = content.d;
+                        specialMessage.style.display = 'block';
+                    });
+                } else if (type === 'gift') {
+                    star.classList.add('gift-star');
+                    star.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if(confirm(`¿Abrir regalo: ${content.t}?`)) window.open(content.link, '_blank');
+                    });
+                }
+            }
+            universe.appendChild(star);
+        }
+
+        function closeMessage() { specialMessage.style.display = 'none'; }
+        init();
+    </script>
+</body>
+</html>
