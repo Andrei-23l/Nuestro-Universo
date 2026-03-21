@@ -40,22 +40,17 @@
 
         .star { position: absolute; background-color: white; border-radius: 50%; animation: blink 3s infinite; }
         .clickable-star { cursor: pointer; z-index: 10; }
-        .clickable-star::after {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70px; height: 70px; background: transparent;
-        }
-
+        
         .special-star { 
             width: 10px !important; height: 10px !important; 
             background-color: #ffd700 !important;
-            box-shadow: 0 0 15px 5px #ffd700, 0 0 30px 10px rgba(255, 215, 0, 0.6); 
+            box-shadow: 0 0 15px 5px #ffd700; 
         }
         
         .gift-star { 
             width: 10px !important; height: 10px !important; 
             background-color: #ff69b4 !important;
-            box-shadow: 0 0 18px 6px #ff69b4, 0 0 35px 12px rgba(255, 105, 180, 0.7); 
+            box-shadow: 0 0 18px 6px #ff69b4; 
         }
 
         @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
@@ -65,14 +60,14 @@
             transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 12px 20px;
+            padding: 12px 25px;
             border-radius: 50px;
             display: flex; align-items: center; gap: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             z-index: 2000;
         }
-        .player-btn { background: none; border: none; color: white; font-size: 1.4em; cursor: pointer; }
-        #song-info { font-size: 0.75em; color: #ffd700; font-weight: bold; min-width: 70px; text-align: center; }
+        .player-btn { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; }
+        #song-info { font-size: 0.8em; color: #ffd700; font-weight: bold; }
 
         #special-message {
             display: none; position: fixed; top: 50%; left: 50%;
@@ -81,14 +76,14 @@
             border-radius: 20px; padding: 30px; width: 80%; max-width: 400px;
             border: 1px solid #ffd700; z-index: 3000; text-align: center;
         }
-        button.main-btn { background: #ffd700; border: none; color: black; padding: 12px 24px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        button.main-btn { background: #ffd700; border: none; color: black; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 1.1em; }
     </style>
 </head>
 <body>
 
     <div id="overlay-inicio">
-        <h1 style="color: #ffd700;">Nuestro Universo</h1>
-        <p>Toca el botón para iniciar la música</p>
+        <h1 style="color: #ffd700; font-size: 2.5em;">Nuestro Universo</h1>
+        <p style="margin-bottom: 20px;">Sube el volumen antes de entrar</p>
         <button class="main-btn" onclick="empezarViaje()">INICIAR VIAJE ✨</button>
     </div>
 
@@ -100,10 +95,8 @@
     <div id="universe"></div>
 
     <div id="player-ui">
-        <button class="player-btn" onclick="cambiarCancion(-1)">⏮</button>
         <button class="player-btn" id="play-pause" onclick="togglePlay()">⏸</button>
-        <button class="player-btn" onclick="cambiarCancion(1)">⏭</button>
-        <div id="song-info">Música 1</div>
+        <div id="song-info">Música: Nuestra Canción</div>
     </div>
 
     <div id="special-message">
@@ -112,66 +105,44 @@
         <button class="main-btn" onclick="closeMessage()">Seguir explorando</button>
     </div>
 
-    <audio id="cancion" crossorigin="anonymous">
-        <source id="audio-src" src="musica_1.mp3" type="audio/mpeg">
+    <audio id="cancion" preload="auto">
+        <source src="musica_1.mp3" type="audio/mpeg">
+        <track id="track-letras" kind="captions" src="letra_1.vtt" srclang="es" default>
     </audio>
 
     <script>
         const audio = document.getElementById('cancion');
-        const audioSrc = document.getElementById('audio-src');
         const playPauseBtn = document.getElementById('play-pause');
         const lyricEs = document.getElementById('lyric-es');
         const lyricEn = document.getElementById('lyric-en');
-        const songInfo = document.getElementById('song-info');
         const universe = document.getElementById('universe');
 
-        let currentSongIndex = 1;
-        const totalSongs = 1; 
-
-        // 1. FUNCIÓN DE CARGA SEGURA
-        function cargarMusicaYLetra(index) {
-            audio.pause();
-            audioSrc.src = `musica_1.mp3?v=${new Date().getTime()}`; // Evita el cache
-            audio.load();
-
-            // Cargar Track de letras
-            const existingTrack = audio.querySelector('track');
-            if (existingTrack) audio.removeChild(existingTrack);
-
-            const track = document.createElement('track');
-            track.kind = 'captions';
-            track.label = 'Español';
-            track.srclang = 'es';
-            track.src = `letra_1.vtt?v=${new Date().getTime()}`;
-            track.default = true;
-
-            track.addEventListener('cuechange', function() {
-                const cues = this.track.activeCues;
-                if (cues.length > 0) {
-                    const texto = cues[0].text.split('\n');
-                    lyricEn.innerText = texto[0] || "";
-                    lyricEs.innerText = texto[1] || "";
-                } else {
-                    lyricEn.innerText = ""; lyricEs.innerText = "";
-                }
-            });
-
-            audio.appendChild(track);
-            songInfo.innerText = `Música ${index}`;
+        // Configuración de letras
+        function setupLyrics() {
+            const track = audio.textTracks[0];
+            if (track) {
+                track.mode = 'hidden';
+                track.oncuechange = () => {
+                    const cues = track.activeCues;
+                    if (cues && cues.length > 0) {
+                        const lineas = cues[0].text.split('\n');
+                        lyricEn.innerText = lineas[0] || "";
+                        lyricEs.innerText = lineas[1] || "";
+                    } else {
+                        lyricEn.innerText = ""; lyricEs.innerText = "";
+                    }
+                };
+            }
         }
 
-        // 2. INICIO CON INTERACCIÓN HUMANA (Obligatorio para navegadores)
         function empezarViaje() {
             document.getElementById('overlay-inicio').style.display = 'none';
-            cargarMusicaYLetra(currentSongIndex);
-            
-            const promise = audio.play();
-            if (promise !== undefined) {
-                promise.catch(error => {
-                    console.error("Autoplay bloqueado:", error);
-                    playPauseBtn.innerText = "▶"; // Muestra Play si falló el inicio automático
-                });
-            }
+            setupLyrics();
+            // El truco es darle play INMEDIATAMENTE después del clic
+            audio.play().catch(err => {
+                console.log("Error al reproducir automáticamente:", err);
+                playPauseBtn.innerText = "▶"; 
+            });
         }
 
         function togglePlay() {
@@ -184,12 +155,7 @@
             }
         }
 
-        function cambiarCancion(dir) {
-            // Lógica para el futuro si agregas más temas
-            alert("Por ahora solo tenemos música_1 lista. ¡Pronto más!");
-        }
-
-        // --- EL RESTO DEL CÓDIGO (Estrellas y Movimiento) ---
+        // --- UNIVERSO Y ESTRELLAS (RECONSTRUIDO AL 100%) ---
         const universeSize = 7000;
         let curX = -(universeSize / 2) + (window.innerWidth / 2);
         let curY = -(universeSize / 2) + (window.innerHeight / 2);
@@ -243,8 +209,8 @@
         function createStar(type, content = null) {
             const star = document.createElement('div');
             star.className = 'star';
-            star.style.left = Math.random() * (universeSize - 200) + 100 + 'px';
-            star.style.top = Math.random() * (universeSize - 200) + 100 + 'px';
+            star.style.left = Math.random() * (universeSize - 400) + 200 + 'px';
+            star.style.top = Math.random() * (universeSize - 400) + 200 + 'px';
 
             if (type === 'bg') {
                 const s = Math.random() * 2 + 1;
@@ -273,11 +239,6 @@
         function closeMessage() { document.getElementById('special-message').style.display = 'none'; }
         
         init();
-
-        // Alerta de error si el archivo no existe
-        audio.onerror = function() {
-            alert("No se pudo cargar el archivo musica_1.mp3. Asegúrate de que esté en la misma carpeta que el index.html");
-        };
     </script>
 </body>
 </html>
