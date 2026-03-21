@@ -29,7 +29,6 @@
             transition: transform 0.1s ease-out;
         }
 
-        /* Letras */
         #lyrics-container {
             position: fixed; top: 40%; left: 50%;
             transform: translate(-50%, -50%);
@@ -40,7 +39,6 @@
         #lyric-es { font-size: 2.2em; font-weight: bold; margin-bottom: 10px; min-height: 1.2em; }
         #lyric-en { font-size: 1.2em; font-style: italic; color: rgba(255,255,255,0.6); min-height: 1.2em; }
 
-        /* Estrellas */
         .star { position: absolute; background-color: white; border-radius: 50%; animation: blink 3s infinite; }
         .clickable-star { cursor: pointer; z-index: 10; }
         .special-star { width: 9px !important; height: 9px !important; box-shadow: 0 0 15px 5px #ffd700; }
@@ -48,7 +46,6 @@
 
         @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
 
-        /* Mini Reproductor */
         #player-ui {
             position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%);
@@ -59,17 +56,13 @@
             display: flex; align-items: center; gap: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             z-index: 2000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .player-btn {
             background: none; border: none; color: white;
             font-size: 1.5em; cursor: pointer; transition: 0.3s;
-            padding: 0; margin: 0;
         }
-        .player-btn:hover { color: #ffd700; transform: scale(1.1); }
         #song-info { font-size: 0.8em; color: #ffd700; min-width: 80px; text-align: center; font-weight: bold; }
 
-        /* Mensajes */
         #special-message {
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
@@ -85,7 +78,7 @@
 
     <div id="overlay-inicio">
         <h1 style="color: #ffd700;">Nuestro Universo</h1>
-        <p>Sube el volumen y explora nuestras canciones</p>
+        <p>Sube el volumen para comenzar</p>
         <button class="main-btn" onclick="empezarViaje()">INICIAR VIAJE ✨</button>
     </div>
 
@@ -111,45 +104,37 @@
 
     <audio id="cancion">
         <source id="audio-src" src="musica_1.mp3" type="audio/mpeg">
-        <track id="track-letras" kind="captions" src="letra_1.vtt" srclang="es" default>
     </audio>
 
     <script>
         const universe = document.getElementById('universe');
         const audio = document.getElementById('cancion');
         const audioSrc = document.getElementById('audio-src');
-        const trackTag = document.getElementById('track-letras');
         const lyricEs = document.getElementById('lyric-es');
         const lyricEn = document.getElementById('lyric-en');
         const songInfo = document.getElementById('song-info');
         const playPauseBtn = document.getElementById('play-pause');
 
         let currentSongIndex = 1;
-        const totalSongs = 3; // CAMBIA ESTO al número total de canciones que tengas
+        const totalSongs = 1; // Cambia esto si subes musica_2, etc.
 
-        // Configuración Inicial Universo
+        // Iniciar posición del universo
         const universeSize = 7000;
         let curX = -(universeSize / 2) + (window.innerWidth / 2);
         let curY = -(universeSize / 2) + (window.innerHeight / 2);
         universe.style.left = curX + 'px';
         universe.style.top = curY + 'px';
 
-        // Mensajes y Regalos (Tus datos anteriores)
-        const mensajes = [
-            { t: "La Primera Conversación", d: "Desde ese día supe que serías alguien especial." },
-            { t: "Nuestras Risas", d: "Amo cómo logramos reírnos de cualquier tontería." },
-            { t: "Te Amo", d: "Eres mi universo entero. Felices 7 meses." }
-        ];
-        const regalos = [{ t: "Mes 7", link: "7_meses.html" }];
-
-        // FUNCIONES DE REPRODUCTOR
-        function loadSong(index) {
+        // Función para cargar canción y letra
+        async function loadSong(index) {
             audio.pause();
-            // Actualizar archivos según tu nomenclatura
             audioSrc.src = `musica_${index}.mp3`;
             
-            // Re-crear el track para forzar la carga del nuevo VTT
-            const oldTrack = document.getElementById('track-letras');
+            // Limpiar tracks anteriores
+            const oldTracks = audio.querySelectorAll('track');
+            oldTracks.forEach(t => t.remove());
+
+            // Crear nuevo track
             const newTrack = document.createElement('track');
             newTrack.id = 'track-letras';
             newTrack.kind = 'captions';
@@ -157,14 +142,34 @@
             newTrack.srclang = 'es';
             newTrack.default = true;
             
-            audio.removeChild(oldTrack);
             audio.appendChild(newTrack);
-            
             songInfo.innerText = `Canción ${index}`;
+            
             audio.load();
-            audio.play();
+            
+            // Configurar el listener de letras para el nuevo track
+            newTrack.addEventListener('cuechange', function() {
+                const activeCues = this.track.activeCues;
+                if (activeCues && activeCues.length > 0) {
+                    const texto = activeCues[0].text.split('\n');
+                    lyricEn.innerText = texto[0] || "";
+                    lyricEs.innerText = texto[1] || "";
+                } else {
+                    lyricEs.innerText = "";
+                    lyricEn.innerText = "";
+                }
+            });
+
+            return new Promise((resolve) => {
+                audio.oncanplaythrough = () => resolve();
+            });
+        }
+
+        async function empezarViaje() {
+            document.getElementById('overlay-inicio').style.display = 'none';
+            await loadSong(currentSongIndex);
+            audio.play().catch(e => console.log("Reintento de play necesario"));
             playPauseBtn.innerText = "⏸";
-            setupTrackListener(newTrack);
         }
 
         function togglePlay() {
@@ -181,29 +186,10 @@
             currentSongIndex += dir;
             if (currentSongIndex > totalSongs) currentSongIndex = 1;
             if (currentSongIndex < 1) currentSongIndex = totalSongs;
-            loadSong(currentSongIndex);
+            loadSong(currentSongIndex).then(() => audio.play());
         }
 
-        function setupTrackListener(trackElement) {
-            trackElement.addEventListener('cuechange', function() {
-                const activeCues = this.track.activeCues;
-                if (activeCues && activeCues.length > 0) {
-                    const texto = activeCues[0].text.split('\n');
-                    lyricEn.innerText = texto[0] || "";
-                    lyricEs.innerText = texto[1] || "";
-                } else {
-                    lyricEs.innerText = "";
-                    lyricEn.innerText = "";
-                }
-            });
-        }
-
-        function empezarViaje() {
-            document.getElementById('overlay-inicio').style.display = 'none';
-            loadSong(currentSongIndex);
-        }
-
-        // LÓGICA DE MOVIMIENTO (Draggable)
+        // Sistema de arrastre (Draggable)
         let isDragging = false, startX, startY;
         const moveStart = (e) => { 
             if (e.target.closest('#player-ui') || e.target.classList.contains('clickable-star')) return;
@@ -222,12 +208,19 @@
         window.addEventListener('mousemove', moveAction); window.addEventListener('touchmove', moveAction);
         window.addEventListener('mouseup', () => isDragging = false); window.addEventListener('touchend', () => isDragging = false);
 
-        // GENERACIÓN DE ESTRELLAS
+        // Mensajes y Estrellas
+        const mensajes = [
+            { t: "La Primera Conversación", d: "Desde ese día supe que serías alguien especial." },
+            { t: "Nuestras Risas", d: "Amo cómo logramos reírnos de cualquier tontería." },
+            { t: "Te Amo", d: "Eres mi universo entero. Felices 7 meses." }
+        ];
+
+        const regalos = [{ t: "Mes 7", link: "7_meses.html" }];
+
         function init() {
             for (let i = 0; i < 2000; i++) createStar('bg');
             mensajes.forEach(m => createStar('special', m));
             regalos.forEach(r => createStar('gift', r));
-            setupTrackListener(trackTag);
         }
 
         function createStar(type, content = null) {
